@@ -58,6 +58,22 @@ void calculate_total_distance_between_pairs (LocationID *const left_list, Locati
     printf("Total distance: %d\n", sum);
 }
 
+void calculate_similarity_score (const LocationID *const left_list, const LocationID *const right_list, const size_t size) {
+    int sum = 0;
+
+    for (size_t i = 0; i < size; i++) {
+        int repetitions = 0;
+        for (size_t j = 0; j < size; j++) {
+            if (left_list[i] == right_list[j]) {
+                repetitions++;
+            }
+        }
+        sum += left_list[i] * repetitions;
+    }
+
+    printf("Similarity score: %d\n", sum);
+}
+
 int main(void) {
     printf("\n****** Day 1 ******\n\n");
 
@@ -68,6 +84,7 @@ int main(void) {
     read_input_file(FILENAME_REAL, &left_list, &right_list, &size);
 
     calculate_total_distance_between_pairs(left_list, right_list, size);
+    calculate_similarity_score(left_list, right_list, size);
 
     free(left_list);
     free(right_list);
