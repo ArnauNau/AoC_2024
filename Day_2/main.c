@@ -133,12 +133,41 @@ bool check_report_safety(Report *const report) {
     return report->safe == true;
 }
 
+bool check_report_safety_with_problem_dampener(const Report *const report) {
+    if (report->safe == true) {
+        return true;
+    }
+
+    Level temp_levels[report->num_of_levels - 1];
+
+    for (int i = 0; i < report->num_of_levels; i++) {
+        int level_index = 0;
+        for (int j = 0; j < report->num_of_levels; j++) {
+            if (j != i) {
+                temp_levels[level_index++] = report->levels[j];
+            }
+        }
+
+        // Create a temporary sub-report
+        Report sub_report;
+        sub_report.levels = temp_levels;
+        sub_report.num_of_levels = report->num_of_levels - 1;
+
+        if (check_report_safety(&sub_report)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 int main (void) {
     printf("\n****** Day 2 ******\n\n");
 
     Report *reports = nullptr;
     size_t size = 0;
     int safe_reports = 0;
+    int safe_reports_with_problem_dampener = 0;
 
     read_input_file(FILENAME_REAL, &reports, &size);
     printf("Number of reports: %zu\n", size);
@@ -146,11 +175,13 @@ int main (void) {
     for (size_t i = 0; i < size; i++) {
         //printf("\nReport %zu:", i);
         if (check_report_safety(&reports[i])) safe_reports++;
+        if (check_report_safety_with_problem_dampener(&reports[i])) safe_reports_with_problem_dampener++;
         free(reports[i].levels);
     }
     free(reports);
 
     printf("\nSafe reports: %d\n", safe_reports);
+    printf("Safe reports with problem dampener: %d\n", safe_reports_with_problem_dampener);
 
     exit(EXIT_SUCCESS);
 }
